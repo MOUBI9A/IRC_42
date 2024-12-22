@@ -278,11 +278,17 @@ void Server::findCommand(int fd, std::string command, __unused std::string param
         else
         {
             if(findUserNick(nickName))
+            {
                 cl[0].setNickName(nickName + "_");
+                std::string msgNick = ERR_NICKNAMEINUSE(cl[0].getNickName(), cl[0].getNickName()); /// TODO check
+                send(fd , msgNick.c_str(), msgNick.size(), 0);
+            }
             else
+            {
                 cl[0].setNickName(nickName);
-            std::string msgNick = ":" + cl[0].getNickName() + "!" + cl[0].getUserName() + "@" + cl[0].getIPadd() + " NICK :" + nickName + "\r\n";
-            send(fd , msgNick.c_str(), msgNick.size(), 0);
+                std::string msgNick = ":" + cl[0].getNickName() + "!" + cl[0].getUserName() + "@" + cl[0].getIPadd() + " NICK :" + nickName + "\r\n";
+                send(fd , msgNick.c_str(), msgNick.size(), 0);
+            }
         }
         return;
     }
@@ -392,44 +398,7 @@ void Server::findCommand(int fd, std::string command, __unused std::string param
         send(fd, msg.c_str(), msg.size(), 0);
         
     }
-    else if(command == "KICK")
-    {
-        std::string channelName, nickName, reason;
-        std::istringstream iss(param);
-        iss >> channelName;
-        iss >> nickName;
-        iss >> reason;
-        if (channelName[0] != '#')
-        {
-            std::string msg = ":" + this->serverName   + ERR_NOSUCHCHANNEL(cl[0].getNickName(), channelName);
-            send(fd, msg.c_str(), msg.size(), 0);
-            return;
-        }
-        if (!findChanel(channelName))
-        {
-            std::string msg = ":" + this->serverName   + ERR_NOSUCHCHANNEL(cl[0].getNickName(), channelName);
-            send(fd, msg.c_str(), msg.size(), 0);
-            return;
-        }
-        Channel channel = getChannelbyName(channelName);
-        if (channel.getAccess()->cl.getNickName() != cl[0].getNickName())
-        {
-            std::string msg = ":" + this->serverName   + ERR_CHANOPRIVSNEEDED(cl[0].getNickName(), channelName);
-            send(fd, msg.c_str(), msg.size(), 0);
-            return;
-        }
-        t_ch_access *tmp = channel.getAccess();
-        while (tmp != nullptr)
-        {
-            if (tmp->cl.getNickName() == nickName)
-            {
-                std::string msg = ":" + cl[0].getNickName() + "!" + cl[0].getUserName() + "@" + cl[0].getIPadd() + " KICK " + channelName + " " + nickName + " :" + reason + "\r\n";
-                send(tmp->cl.getFD(), msg.c_str(), msg.size(), 0);
-                break;
-            }
-            tmp = tmp->next;
-        }
-    }
+   
     else if (command == "WHO" || command == "who")
     {
         std::string channelName;
@@ -462,11 +431,11 @@ void Server::findCommand(int fd, std::string command, __unused std::string param
     }
     else if(command == "KICK")
     {
-        std::string skip, channelName, nickName;
+        std::string channelName, nickName, reason;
         std::istringstream iss(param);
-        iss >> skip;
         iss >> channelName;
         iss >> nickName;
+        iss >> reason;
         if (channelName[0] != '#')
         {
             std::string msg = ":" + this->serverName   + ERR_NOSUCHCHANNEL(cl[0].getNickName(), channelName);
@@ -480,21 +449,23 @@ void Server::findCommand(int fd, std::string command, __unused std::string param
             return;
         }
         Channel channel = getChannelbyName(channelName);
-        bool isOp = false;
-        std::vector<Client> users = channel.getClients();
-        for(std::vector<Client>::iterator it = users.begin(); it != users.end(); ++it)
-        {
-            if (it->getNickName() == cl[0].getNickName())
-            {
-                isOp = it->getOperator();
-                break;
-            }
-        }
+        bool isOp = channel.getPermission(cl[0], "operator");
         if(isOp)
         {
-            channel.removeClient(cl[0]);
-            std::string msg = ":" + cl[0].getNickName() + "!" + cl[0].getUserName() + "@" + cl[0].getIPadd() + " KICK " + channelName + " " + nickName + " :Kicked by " + cl[0].getNickName() + "\r\n";
-            send_to_members(channelName, msg, -1);
+            Client usr = getUserbyNick(nickName);
+            if(cl[0].getNickName() == usr.getNickName())
+            {
+                std::string msg = ":" + this->serverName   + "BAD TRIP AZEBI "; //TODO REMOUVE
+                c
+                send_to_members(channelName, msg, -1);
+            }
+            else
+            {
+                channel.removeClient(usr);
+                std::string msg = ":" + cl[0].getNickName() + "!" + cl[0].getUserName() + "@" + cl[0].getIPadd() + " KICK " + channelName + " " + nickName + " :Kicked by " + cl[0].getNickName() + "\r\n";
+                send_to_members(channelName, msg, -1);
+
+            }
         }
         else
         {
@@ -565,16 +536,7 @@ void Server::findCommand(int fd, std::string command, __unused std::string param
             return;
         }
         Channel channel = getChannelbyName(channelName);
-        bool isOp = false;
-        std::vector<Client> users = channel.getClients();
-        for(std::vector<Client>::iterator it = users.begin(); it != users.end(); ++it)
-        {
-            if (it->getNickName() == cl[0].getNickName())
-            {
-                isOp = it->getOperator();
-                break;
-            }
-        }
+        bool isOp = channel.getPermission(cl[0], "operator");
         if(isOp)
         {
             Client Invite = getUserbyNick(nickName);
@@ -615,16 +577,7 @@ void Server::findCommand(int fd, std::string command, __unused std::string param
             return;
         }
         Channel channel = getChannelbyName(channelName);
-        bool isOp = false;
-        std::vector<Client> users = channel.getClients();
-        for(std::vector<Client>::iterator it = users.begin(); it != users.end(); ++it)
-        {
-            if (it->getNickName() == cl[0].getNickName())
-            {
-                isOp = it->getOperator();
-                break;
-            }
-        }
+        bool isOp = cl[0].getOperator();
         if(isOp)
         {
             channel.setTopic(topic);
@@ -648,10 +601,6 @@ void Server::findCommand(int fd, std::string command, __unused std::string param
         send_to_members("", msg, -1);
         Clearclients(fd);
     }
-    
-    
-    
-    
     
     else if (command == "MODE")
     {
