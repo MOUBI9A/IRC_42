@@ -11,8 +11,8 @@ Channel::Channel()
     this->password = "";
     this->topic = "";
     this->userCount = 0;
-    this->access = nullptr;
-    this->creationTime = std::time(nullptr);
+    this->access = NULL;
+    this->creationTime = std::time(NULL);
 }
 
 Channel::Channel(std::string channelName, std::string password, std::string topic)
@@ -23,7 +23,7 @@ Channel::Channel(std::string channelName, std::string password, std::string topi
     this->hasTopic = true;
     this->topic = topic;
     this->userCount = 0;
-    this->access = nullptr;
+    this->access = NULL;
     this->hasLimit = false;
     this->inviteOnly = false;
     this->limit = MAX_CLIENTS;
@@ -108,12 +108,12 @@ void Channel::addClient(Client cl)
 void Channel::removeClient(Client cl)
 {
     t_ch_access *tmp = this->access;
-    t_ch_access *prev = nullptr;
-    while (tmp != nullptr)
+    t_ch_access *prev = NULL;
+    while (tmp != NULL)
     {
         if (tmp->cl.getNickName() == cl.getNickName())
         {
-            if (prev == nullptr)
+            if (prev == NULL)
                 this->access = tmp->next;
             else
                 prev->next = tmp->next;
@@ -128,7 +128,7 @@ void Channel::removeClient(Client cl)
 void Channel::setPermission(Client cl,bool isOperator)
 {
     t_ch_access *tmp = this->access;
-    while (tmp != nullptr)
+    while (tmp != NULL)
     {
         if (tmp->cl.getNickName() == cl.getNickName())
         {
@@ -142,7 +142,7 @@ void Channel::setPermission(Client cl,bool isOperator)
 bool Channel::getPermission(Client cl, std::string permission)
 {
     t_ch_access *tmp = this->access;
-    while (tmp != nullptr)
+    while (tmp != NULL)
     {
         if (tmp->cl.getNickName() == cl.getNickName())
         {
@@ -159,7 +159,7 @@ std::vector<Client> Channel::getClients()
 {
     std::vector<Client> clients;
     t_ch_access *tmp = this->access;
-    while (tmp != nullptr)
+    while (tmp != NULL)
     {
         clients.push_back(tmp->cl);
         if (tmp->isOperator)
@@ -190,7 +190,7 @@ std::string Channel::getModes()
     modes += this->hasLimit ? "l" : "";
 
     modes += this->hasPassword ? " " + this->password : "";
-    modes += this->hasLimit ? " " + std::to_string(this->limit) : "";
+    modes += this->hasLimit ? " " + to_string(this->limit) : "";
 
     return modes;
 }

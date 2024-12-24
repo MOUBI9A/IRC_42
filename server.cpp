@@ -219,11 +219,11 @@ Client* Server::getUserbyFD(int fd)
         if(clients[i].getFD() == fd)
             return &clients[i];
     }
-    return nullptr;
+    return NULL;
 }
 
 
-void Server::findCommand(int fd, std::string command, __unused std::string param)
+void Server::findCommand(int fd, std::string command, std::string param)
 {
     Client *cl = getUserbyFD(fd);
     if(cl[0].getFD() != fd )
@@ -456,7 +456,6 @@ void Server::findCommand(int fd, std::string command, __unused std::string param
             if(cl[0].getNickName() == usr.getNickName())
             {
                 std::string msg = ":" + this->serverName   + "BAD TRIP AZEBI "; //TODO REMOUVE
-                c
                 send_to_members(channelName, msg, -1);
             }
             else
@@ -606,6 +605,7 @@ void Server::findCommand(int fd, std::string command, __unused std::string param
     {
         std::string channelName, mode, arg, msg;
         std::istringstream iss(param);
+        int limit;
         iss >> channelName;
         iss >> mode;
         iss >> arg;
@@ -628,7 +628,7 @@ void Server::findCommand(int fd, std::string command, __unused std::string param
         {
             msg = ":" + this->serverName   + RPL_CHANNELMODEIS(cl[0].getNickName(), channelName, channel.getModes());
             send(fd, msg.c_str(), msg.size(), 0);
-            std::string msg = ":" + this->serverName   + RPL_CREATIONTIME(cl[0].getNickName(), channelName, std::to_string(channel.getCreationTime()));
+            std::string msg = ":" + this->serverName   + RPL_CREATIONTIME(cl[0].getNickName(), channelName, channel.getCreationTime());
             send(fd, msg.c_str(), msg.size(), 0);
             return;
         }
@@ -703,11 +703,13 @@ void Server::findCommand(int fd, std::string command, __unused std::string param
                 send(fd, msg.c_str(), msg.size(), 0);
                 return;
             }
-            else if (std::stoi(arg) < 0)
+            limit = atoi(arg.c_str());
+            if (limit < 0)
                 return;
     
             channel.setHasLimit(true);  
-            channel.setLimit(std::stoi(arg));
+            limit = atoi(arg.c_str());
+            channel.setLimit(limit);
             msg = ":" + cl[0].getNickName() + "!" + cl[0].getUserName() + "@" + cl[0].getIPadd() + " MODE " + channelName + " +l " + arg + "\r\n";
             send_to_members(channelName, msg, -1);
         }
@@ -836,7 +838,7 @@ void Server::send_to_members(std::string channelName, std::string msg, int fd)
         }
     }
     t_ch_access *tmp = chanel.getAccess();
-    while (tmp != nullptr)
+    while (tmp != NULL)
     {
         if (tmp->cl.getFD() != fd)
             send(tmp->cl.getFD(), msg.c_str(), msg.size(), 0);

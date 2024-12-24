@@ -10,10 +10,14 @@
 #include <unistd.h>                                 
 #include <arpa/inet.h>                            
 #include <poll.h>                               
-#include <csignal>     
+#include <csignal>  
+#include <iostream>
+#include <cstdlib>  
+#include <cstring>
 
 #include "server.hpp"
 #include <sstream> 
+
 
 
 
@@ -31,7 +35,13 @@
 
 class Client;
 class Channel;
-
+template <typename T>
+std::string to_string(T value)
+{
+    std::ostringstream oss;
+    oss << value;
+    return oss.str();
+}
 
 #define MAX_CHANNEL 10
 
@@ -72,7 +82,9 @@ class Channel;
 #define RPL_CHANNELMODEIS(client, channel, modes)								("324 " + client + " " + channel + " " + modes + "\r\n")
 #define	ERR_NOSUCHNICK(client, nickname)	("401 " + client + " " + nickname + " :No such nick\r\n")
 #define ERR_NOTEXTTOSEND(client)			("412 " + client + " :No text to send\r\n")
-#define RPL_CREATIONTIME(client, channel, time)	("329 " + client + " " + channel + " " + time + "\r\n")
+#define RPL_CREATIONTIME(client, channel, creation_time)	("329 " + client + " " + channel + " " + to_string(creation_time) + "\r\n")
+
+
 
 class Server
 {

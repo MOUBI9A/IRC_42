@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 #include "client.hpp"
+#include <ctime> // For std::time_t
+#include <string> // For std::string
 
 #define MAX_CLIENTS 10
 
