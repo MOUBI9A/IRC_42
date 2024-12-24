@@ -30,6 +30,7 @@ class Channel
         std::string password;
         std::string topic;
         std::time_t creationTime;
+        std::vector<Client> InvitedClients;
 
         int userCount;
         
@@ -43,7 +44,12 @@ class Channel
         Channel(std::string channelName, std::string password, std::string topic);
         ~Channel();
 
+        // void setInvitedClients(std::vector<Client> InvitedClients);
 
+        // std::vector<Client> getInvitedClients();
+        void addInvitedClient(Client cl);
+        void removeInvitedClient(Client cl);
+        bool isInvited(Client cl);
 
         void setChannelName(std::string channelName);
         std::string getChannelName();

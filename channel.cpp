@@ -225,3 +225,30 @@ bool Channel::getHasLimit()
 {
     return this->hasLimit;
 }
+
+void Channel::addInvitedClient(Client cl)
+{
+    this->InvitedClients.push_back(cl);
+}
+
+void Channel::removeInvitedClient(Client cl)
+{
+    for (size_t i = 0; i < this->InvitedClients.size(); i++)
+    {
+        if (this->InvitedClients[i].getNickName() == cl.getNickName())
+        {
+            this->InvitedClients.erase(this->InvitedClients.begin() + i);
+            return;
+        }
+    }
+}
+
+bool Channel::isInvited(Client cl)
+{
+    for (size_t i = 0; i < this->InvitedClients.size(); i++)
+    {
+        if (this->InvitedClients[i].getNickName() == cl.getNickName())
+            return true;
+    }
+    return false;
+}

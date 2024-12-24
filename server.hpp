@@ -138,7 +138,7 @@ class Server
         Client getUserbyNick(std::string nick);
         Client* getUserbyFD(int fd);
 
-        Channel getChannelbyName(std::string channelName);
+        Channel* getChannelbyName(std::string channelName);
 
 
 

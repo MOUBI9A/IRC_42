@@ -1,4 +1,0 @@
-kick command doesnt work with operator
-a none operator user can kick himself
-NICK without arguments sets nickname to NICK
-multiple users with the same nickname
