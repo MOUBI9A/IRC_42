@@ -76,6 +76,29 @@ Server::Server()
     this->password = "";
     channels.clear();
     chanelCount = 0;
+    // set the bot
+    bot.setNickName("bot");
+    bot.setUserName("bot");
+    bot.setRealName("bot");
+    bot.setIPadd("69.69.69.69");
+    bot.setSigned(true);
+    bot.setFD(-88);
+    bot.setOperator(true);
+
+    clients.push_back(bot);
+    // set the bot channel
+    botChannel.setChannelName("#bot");
+    botChannel.setTopic("This is the bot channel");
+    botChannel.setHasPassword(true);
+    botChannel.setPassword("bootroot");
+    // botChannel.setInviteOnly(true);
+    botChannel.setHasLimit(true);
+    botChannel.setLimit(2);
+    botChannel.addClient(bot);
+    channels.push_back(botChannel);
+    this->chanelCount++;
+
+
 }
 
 Server::~Server() {}
@@ -306,7 +329,6 @@ void Server::findCommand(int fd, std::string command, std::string param)
             cl[0].setSigned(true);
             std::stringstream ss;
             ss << (cl[0].getFD() - 3);
-            // std::string response = "ID "  + ss.str() + ": 001 Welcome to the 0.Matrix\r\n";
             std::string response = RPL_WELCOME(cl[0].getNickName(), ":" + this->serverName);
             send(fd, response.c_str(), response.size(), 0);
         }
@@ -878,6 +900,8 @@ void Server::findCommand(int fd, std::string command, std::string param)
     }
     else if (command == "BOT")
     {
+        // Client *Bot = getUserbyFD(-88);
+        Channel *channelbot = getChannelbyName("#bot");
 
         std::string botmsg = "Hello, I am a bot i will help you until you find the one who will help you";
         botmsg += "\r\n";
@@ -885,20 +909,18 @@ void Server::findCommand(int fd, std::string command, std::string param)
         botmsg += "1. sell <item> <price> <quantity> {NOTE : there is just Two items available : 'Beldiya' and 'Roumiya'}\r\n";
         botmsg += "2. random joke about weed & smoking\r\n";
         botmsg += "3. find the one who will help you\r\n";
-        if(!findUserNick("bot"))
+        
+        if(channelbot->getUserCount() == 2)
         {
-            Client bot;
-            bot.setNickName("bot");
-            bot.setFD(-69);
-            bot.setIPadd("69.69.69.69");
-            bot.setRealName("I am a bot i will help you until you find the one who will help you");
-            bot.setUserName("bot");
-            bot.setSigned(true);
-            clients.push_back(bot);
-            findCommand(-69, "JOIN", "#bot");
-            findCommand(-69, "mode", "#bot +l 2");
+            std::string msg = ":" + this->serverName + ERR_CHANNELISFULL(cl[0].getNickName(), channelbot->getChannelName());
+            send(fd, msg.c_str(), msg.size(), 0);
+            return;
         }
-        findCommand(fd, "JOIN", "#bot");
+        if(!channelbot->isClient(cl[0]))
+        {
+            
+        }
+        findCommand(fd, "JOIN", channelbot->getChannelName() + " " + channelbot->getPassword());
         
         // findCommand(-69, "PRIVMSG", botmsg);
         // else if (param == "1")

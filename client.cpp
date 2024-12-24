@@ -1,9 +1,5 @@
 #include "server.hpp"
 
-#include "client.hpp"
-
-
-
 
 void Client::setFD(int fd)
 {
@@ -78,6 +74,8 @@ bool Client::getOperator()
 {
     return this->isOperator;
 }
+
+
 
 Client::Client()
 {

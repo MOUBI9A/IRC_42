@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <vector>
-#include "client.hpp"
 #include <ctime> // For std::time_t
 #include <string> // For std::string
 
@@ -17,6 +16,7 @@ typedef struct s_ch_access
 
     struct s_ch_access *next;
 } t_ch_access;
+
 
 class Channel 
 {
@@ -92,6 +92,7 @@ class Channel
 
         void addClient(Client cl);
         void removeClient(Client cl);
+        bool isClient(Client cl);
 
         
 
