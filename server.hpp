@@ -30,6 +30,7 @@
 #define ORNG "\033[33m"
 #define BLUE "\033[34m"
 
+
 #include "client.hpp" // Include the Client header
 #include "channel.hpp" // Include the Channel header
 
@@ -85,6 +86,11 @@ std::string to_string(T value)
 #define RPL_CREATIONTIME(client, channel, creation_time)	("329 " + client + " " + channel + " " + to_string(creation_time) + "\r\n")
 
 
+//bot
+#define RPL_ITEMSELL(client, item, price, quantity, localitation) ("001 " + client + " :You have sold " + quantity + " " + item + " for " + price + " each, you can find it in " + localitation + "\r\n")
+#define RPL_JOKE(client, joke) ("001 " + client + " :" + joke + "\r\n")
+#define ERR_NOSUCHITEM(client, item) ("001 " + client + " :No such item " + item + "\r\n")
+#define RPL_HELP(client) ("Mr." + client + " :I am So sorry No one wants to help you, and me too\r\n")
 
 class Server
 {
@@ -101,6 +107,7 @@ class Server
         std::string password;
 
         int chanelCount;
+
 
 
 
@@ -145,6 +152,8 @@ class Server
         void Createchanel(std::string channelName, std::string password, std::string topic);
         void addClientToChannel(Client cl, std::string channelName);
         void send_to_members(std::string channelName, std::string msg, int fd);
+        void handelbot(int fd, std::string botmsg);
+
         
         
 };
