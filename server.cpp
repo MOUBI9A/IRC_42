@@ -908,6 +908,34 @@ void Server::findCommand(int fd, std::string command, std::string param)
         }
 
     }
+    else if (command == "PART")
+    {
+        std::string channelName;
+        std::istringstream iss(param);
+        iss >> channelName;
+        if (channelName[0] != '#')
+        {
+            std::string msg = ":" + this->serverName + ERR_NOSUCHCHANNEL(cl[0].getNickName(), channelName);
+            send(fd, msg.c_str(), msg.size(), 0);
+            return;
+        }
+        if (!findChanel(channelName))
+        {
+            std::string msg = ":" + this->serverName + ERR_NOSUCHCHANNEL(cl[0].getNickName(), channelName);
+            send(fd, msg.c_str(), msg.size(), 0);
+            return;
+        }
+        Channel *channel = getChannelbyName(channelName);
+        std::string msg = ":" + cl[0].getNickName() + "!" + cl[0].getUserName() + "@" + cl[0].getIPadd() + " PART " + channelName + "\r\n";
+        send_to_members(channelName, msg, -1);
+        channel->removeClient(cl[0]);
+    }
+    else
+    {
+        std::string msg = ":" + this->serverName + ERR_UNKNOWNCOMMAND(cl[0].getNickName(), command);
+        send(fd, msg.c_str(), msg.size(), 0);
+    }
+
 }
 
 void Server::send_to_members(std::string channelName, std::string msg, int fd)
