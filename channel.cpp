@@ -1,4 +1,4 @@
-#include "server.hpp"
+#include "channel.hpp"
 
 Channel::Channel()
 {
@@ -249,18 +249,6 @@ bool Channel::isInvited(Client cl)
     {
         if (this->InvitedClients[i].getNickName() == cl.getNickName())
             return true;
-    }
-    return false;
-}
-
-bool Channel::isClient(Client cl)
-{
-    t_ch_access *tmp = this->access;
-    while (tmp != NULL)
-    {
-        if (tmp->cl.getNickName() == cl.getNickName())
-            return true;
-        tmp = tmp->next;
     }
     return false;
 }

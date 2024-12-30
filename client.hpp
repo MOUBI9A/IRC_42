@@ -2,6 +2,10 @@
 #define CLIENT_HPP
 
 
+#include "server.hpp"
+
+
+
 
 class Client
 {
@@ -19,8 +23,6 @@ class Client
 
         bool isOperator;
     
-        clock_t start;
-        clock_t end;
 
 
 
@@ -53,12 +55,6 @@ class Client
         void setOperator(bool op);
         bool getOperator();
         
-        void setStart();
-        clock_t getStart();
-
-        void setEnd(clock_t end);
-        clock_t getEnd();
-
         Client &operator=(const Client &cl);
 
 

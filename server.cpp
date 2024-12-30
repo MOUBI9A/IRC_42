@@ -2,64 +2,6 @@
 
 bool Server::Signal = false;
 
-std::string getJoke()
-{   
-    std::string jokes[] = {
-        "Why did the cigarette apply for a job? It wanted to climb the corporate 'ladder.'",
-        "Smoking is the leading cause of statistics.",
-        "I quit smoking once. It was the hardest two hours of my life.",
-        "What do you call a cigarette in church? A holy smokes.",
-        "Cigarettes and computers have one thing in common: they both make you addicted to tabs.",
-        "Why did the smoker break up with his cigarette? It was a toxic relationship.",
-        "Smoking is like paying to damage your lungs—talk about a bad deal!",
-        "What's a smoker's favorite kind of humor? Dry wit.",
-        "I told my friend I quit smoking, and he said, 'Prove it!' So, I lit one last cigarette to celebrate.",
-        "Why don’t smokers write love letters? They’re too busy sending smoke signals.",
-        "What do you call a stoner’s favorite plant? His bud.",
-        "How do stoners do math? They use 'high-draulics.'",
-        "Why don’t stoners get lost? They always follow the 'high-way.'",
-        "What’s a stoner’s favorite instrument? The 'high'-hat cymbal.",
-        "Why was the stoner so good at gardening? He had a green thumb.",
-        "What do you call a really calm stoner? Laid-back Jack.",
-        "How do you know a stoner has been in your fridge? The door is open, and half the food is gone.",
-        "Why don’t stoners argue? Because they’re all about 'joint' decisions.",
-        "How do you keep a stoner busy all day? Hide their snacks.",
-        "What do you call a stoner’s favorite type of music? Reggae-tunes.",
-        "My friend said smoking was bad, so I stopped… taking his advice.",
-        "What do cigarettes and jokes have in common? You inhale, and they leave you breathless.",
-        "Smokers never get lonely—they always have a pack of friends.",
-        "Why did the smoker go to therapy? He had a burning desire to quit.",
-        "A smoker said he felt invisible. I told him to 'lighten' up.",
-        "Smoking and dating are similar; both can leave you burned.",
-        "What do you call a romantic smoker? A 'match' made in heaven.",
-        "Smokers must really like math—they’re constantly counting cigarettes.",
-        "My grandpa quit smoking cold turkey. Now he only smokes warm chicken.",
-        "Smoking is a great way to start a fire… and a debate.",
-        "Why did the stoner become a baker? He wanted to get baked for a living.",
-        "How does a stoner study? He crams the night before and snacks the morning after.",
-        "What do you call a stoner who works out? A 'high-draulics' engineer.",
-        "Why did the stoner open a pizza shop? He had a craving for success.",
-        "What’s a stoner’s favorite martial art? Toke-wan-do.",
-        "What do you call a weed-smoking dinosaur? A Stoner-saurus Rex.",
-        "Why did the stoner bring a ladder to the party? To reach new 'highs.'",
-        "What do you call a stoner superhero? Captain Kush.",
-        "Why don’t stoners play hide-and-seek? They forget what they’re hiding from.",
-        "What’s a stoner’s favorite game? Hungry, Hungry Hippos.",
-        "Did you hear about the smoker who opened a bakery? He was rolling in dough.",
-        "What’s a smoker’s favorite exercise? Lunges.",
-        "Why do stoners love jokes? Because they’re always 'high-ly' amusing.",
-        "My friend gave up smoking weed and started a garden. Now he’s growing his own green.",
-        "Smokers love motivational speeches—they really 'light a fire' under them.",
-        "What’s a smoker’s favorite fairy tale? Puff the Magic Dragon.",
-        "Did you hear about the stoner poet? His words were 'lit.'",
-        "Smokers and stoners should start a band together—they’d call it 'Smokin’ and Tokin.’",
-        "Why are stoners great at improv? They can 'roll' with anything.",
-        "I asked my friend why he stopped smoking weed. He said, 'It was becoming a real drag.'"
-    };
-    int index = rand() % 50;
-    return jokes[index];
-}
-
 void Server::Createchanel(std::string channelName, std::string password, std::string topic)
 {
     Channel newChannel(channelName, password, topic);
@@ -76,29 +18,6 @@ Server::Server()
     this->password = "";
     channels.clear();
     chanelCount = 0;
-    // set the bot
-    bot.setNickName("bot");
-    bot.setUserName("bot");
-    bot.setRealName("bot");
-    bot.setIPadd("69.69.69.69");
-    bot.setSigned(true);
-    bot.setFD(-88);
-    bot.setOperator(true);
-
-    clients.push_back(bot);
-    // set the bot channel
-    botChannel.setChannelName("#bot");
-    botChannel.setTopic("This is the bot channel");
-    botChannel.setHasPassword(true);
-    botChannel.setPassword("bootroot");
-    // botChannel.setInviteOnly(true);
-    botChannel.setHasLimit(true);
-    botChannel.setLimit(2);
-    botChannel.addClient(bot);
-    channels.push_back(botChannel);
-    this->chanelCount++;
-
-
 }
 
 Server::~Server() {}
@@ -109,6 +28,7 @@ void Server::SignalHandler(int signum)
     std::cout << std::endl
               << GRE << "---------->        SIGNAL RECIEVED        <----------" << GRE << std::endl;
     Server::Signal = true;
+    exit(1);
 }
 
 void Server::closeFDS()
@@ -186,6 +106,8 @@ void Server::ServerInit(int port, std::string password)
     std::cout << YEL << "----->        TYPE YES IF YOU WANT NO GEVE THE SERVER A NAME  OR NO TO USE THE DEFAULT NAME        <-----" << WHI << std::endl;
     while (1)
     {
+        if(Server::Signal)
+            exit(1);
         std::string name;
         std::cin >> name;
         if (name == "YES" || name == "yes")
@@ -231,13 +153,6 @@ void Server::ServerInit(int port, std::string password)
         }
     }
     closeFDS();
-}
-
-void Server::handelbot(int fd, std::string botmsg)
-{
-    //TODO handel the bot msg
-    (void)fd;
-    std::cout << "BOT : " << botmsg << std::endl;
 }
 
 void Server::AcceptNewclient()
@@ -306,15 +221,18 @@ Client *Server::getUserbyFD(int fd)
 void Server::findCommand(int fd, std::string command, std::string param)
 {
     Client *cl = getUserbyFD(fd);
-    if (cl[0].getFD() != fd )
+    if (cl[0].getFD() != fd)
     {
         std::cout << RED << "ERROR : CLIENT NOT FOUND" << WHI << std::endl;
         return;
     }
+
     if (command == "")
         return;
+
     else if (command == "CAP" || command == "LS")
         return;
+
     else if (command == "PASS")
     {
         std::string pass = param.substr(0, param.find(" "));
@@ -329,11 +247,13 @@ void Server::findCommand(int fd, std::string command, std::string param)
             cl[0].setSigned(true);
             std::stringstream ss;
             ss << (cl[0].getFD() - 3);
+            // std::string response = "ID "  + ss.str() + ": 001 Welcome to the 0.Matrix\r\n";
             std::string response = RPL_WELCOME(cl[0].getNickName(), ":" + this->serverName);
             send(fd, response.c_str(), response.size(), 0);
         }
         return;
     }
+
     else if (command == "NICK" && cl[0].getSigned())
     {
         std::string nickName = param.substr(0, param.find(" "));
@@ -466,6 +386,7 @@ void Server::findCommand(int fd, std::string command, std::string param)
         std::string msg = ":" + this->serverName + RPL_ENDOFNAMES(cl[0].getNickName(), channelName);
         send(fd, msg.c_str(), msg.size(), 0);
     }
+
     else if (command == "WHO" || command == "who")
     {
         std::string channelName;
@@ -566,12 +487,9 @@ void Server::findCommand(int fd, std::string command, std::string param)
                 send(fd, msg.c_str(), msg.size(), 0);
                 return;
             }
-            if(sendTo == "#bot")
-            {
-                handelbot(fd, message);
-                return;
-            }
+            // Channel *channel = getChannelbyName(sendTo);
             std::string msg = ":" + cl[0].getNickName() + "!" + cl[0].getUserName() + "@" + cl[0].getIPadd() + " PRIVMSG " + sendTo + message + "\r\n";
+            // std::string msg = RPL_PRIVMSG_CH(cl[0].getNickName(), cl[0].getUserName(), cl[0].getIPadd(), sendTo, message);
             send_to_members(sendTo, msg, fd);
         }
         else
@@ -690,6 +608,7 @@ void Server::findCommand(int fd, std::string command, std::string param)
         send_to_members("", msg, -1);
         Clearclients(fd);
     }
+
     else if (command == "MODE")
     {
         std::string channelName, mode, arg, msg;
@@ -900,77 +819,93 @@ void Server::findCommand(int fd, std::string command, std::string param)
     }
     else if (command == "BOT")
     {
-        // Client *Bot = getUserbyFD(-88);
-        Channel *channelbot = getChannelbyName("#bot");
+        std::string channelName, command, ss;
+        std::istringstream iss(param);
+        iss >> channelName;
 
-        std::string botmsg = "Hello, I am a bot i will help you until you find the one who will help you";
-        botmsg += "\r\n";
-        botmsg += "I can help you with the following commands:\r\n";
-        botmsg += "1. sell <item> <price> <quantity> {NOTE : there is just Two items available : 'Beldiya' and 'Roumiya'}\r\n";
-        botmsg += "2. random joke about weed & smoking\r\n";
-        botmsg += "3. find the one who will help you\r\n";
-        
-        if(channelbot->getUserCount() == 2)
+        iss >> command;
+        iss >> ss;
+        if (channelName[0] != '#')
         {
-            std::string msg = ":" + this->serverName + ERR_CHANNELISFULL(cl[0].getNickName(), channelbot->getChannelName());
+            std::string msg = ":" + this->serverName + ERR_NOSUCHCHANNEL(cl[0].getNickName(), channelName);
             send(fd, msg.c_str(), msg.size(), 0);
             return;
         }
-        if(!channelbot->isClient(cl[0]))
+        if (!findChanel(channelName))
         {
-            
+            std::string msg = ":" + this->serverName + ERR_NOSUCHCHANNEL(cl[0].getNickName(), channelName);
+            send(fd, msg.c_str(), msg.size(), 0);
+            return;
         }
-        findCommand(fd, "JOIN", channelbot->getChannelName() + " " + channelbot->getPassword());
-        
-        // findCommand(-69, "PRIVMSG", botmsg);
-        // else if (param == "1")
+        // Channel *channel = getChannelbyName(channelName);
+        // bool isOp = channel->getPermission(cl[0], "operator");
+        // if (!isOp)
         // {
-        //     std::string item, price, quantity;
-        //     std::istringstream iss(param);
-        //     iss >> item;
-        //     iss >> price;
-        //     iss >> quantity;
-        //     if (item.empty() || price.empty() || quantity.empty())
-        //     {
-        //         std::string msg = ":" + this->serverName + ERR_NEEDMOREPARAMS(cl[0].getNickName(), command);
-        //         findCommand(fd, "PRIVMSG", "#bot " + msg);
-        //         return;
-        //     }
-        //     if (item != "Beldiya" && item != "Roumiya")
-        //     {
-        //         std::string msg = ":" + this->serverName + ERR_NOSUCHITEM(cl[0].getNickName(), item);
-        //         findCommand(fd, "PRIVMSG", "#bot " + msg);
-        //         return;
-        //     }
-        //     if (item == "Beldiya")
-        //     {
-        //         std::string msg = ":" + this->serverName + RPL_ITEMSELL(cl[0].getNickName(), item, price, quantity, "https://www.google.com/maps/place/%D8%A7%D9%84%D9%88%D8%A7%D8%AF+%D8%A7%D9%84%D9%85%D8%A7%D9%84%D8%AD,+Martil%E2%80%AD/@35.6309769,-5.294694,17z/data=!3m1!4b1!4m6!3m5!1s0xd0b5b4977060c9d:0x4f5bdaad6e584118!8m2!3d35.6309769!4d-5.2921191!16s%2Fg%2F11g61pc3bh?entry=ttu&g_ep=EgoyMDI0MTIxMS4wIKXMDSoASAFQAw%3D%3D");
-        //         findCommand(fd, "PRIVMSG", "#bot " + msg);
-        //         return;
-        //     }
-        //     else if (item == "Roumiya")
-        //     {
-        //         std::string msg = ":" + this->serverName + RPL_ITEMSELL(cl[0].getNickName(), item, price, quantity, "https://www.google.com/maps/place/%D8%A7%D9%84%D9%88%D8%A7%D8%AF+%D8%A7%D9%84%D9%85%D8%A7%D9%84%D8%AD,+Martil%E2%80%AD/@35.6309769,-5.294694,17z/data=!3m1!4b1!4m6!3m5!1s0xd0b5b4977060c9d:0x4f5bdaad6e584118!8m2!3d35.6309769!4d-5.2921191!16s%2Fg%2F11g61pc3bh?entry=ttu&g_ep=EgoyMDI0MTIxMS4wIKXMDSoASAFQAw%3D%3D");
-        //         findCommand(fd, "PRIVMSG", "#bot " + msg);
-        //         return;
-        //     }
-        // }
-        // else if (param == "2")
-        // {
-        //     std::string msg = ":" + this->serverName + RPL_JOKE(cl[0].getNickName(), getJoke());
+        //     std::string msg = ":" + this->serverName + ERR_CHANOPRIVSNEEDED(cl[0].getNickName(), channelName);
         //     send(fd, msg.c_str(), msg.size(), 0);
         //     return;
         // }
-        // else if (param == "3")
-        // {
-        //     std::string msg = ":" + this->serverName + RPL_HELP(cl[0].getNickName());
-        //     send(fd, msg.c_str(), msg.size(), 0);
-        //     return;
-        // }
-        // else
-        // {
-        //     findCommand(-69, "PRIVMSG", botmsg);
-        // }
+        std::cout << "channelName : " << channelName << std::endl;
+        std::cout << "command : " << command << std::endl;
+        std::cout << "ss : " << ss << std::endl;
+        if(command.empty())
+        {
+            std::string msg2;
+            std::string msg = "you have 3 options to use the bot\r\n";
+            msg2 = RPL_BOT(channelName, msg);
+            send_to_members(channelName, msg2, -1);
+    
+            msg = "1- BOT <channelName> Jock\r\n";
+            msg2 = RPL_BOT(channelName, msg);
+            send_to_members(channelName, msg2, -1);
+            
+            msg = "2- BOT <channelName> Time\r\n";
+            msg2 = RPL_BOT(channelName, msg);
+            send_to_members(channelName, msg2, -1);
+
+            msg = "3- BOT <channelName> File <filePath>\r\n";
+            msg2 = RPL_BOT(channelName, msg);
+            send_to_members(channelName, msg2, -1);
+            return;
+        }
+        else if(command == "Jock")
+        {
+            std::string msg = "Jock of the day : ";
+            msg += getJoke();
+            std::string msg2 = RPL_BOT(channelName, msg);
+            send_to_members(channelName, msg2, -1);
+            return;
+        }
+        else if(command == "Time")
+        {
+            std::string msg = "Time of the day : ";
+            msg += getCurrentTime();
+            std::string msg2 = RPL_BOT(channelName, msg);
+            send_to_members(channelName, msg2, -1);
+            return;
+        }
+        else if(command == "File")
+        {
+            std::string msg = "File of the day : ";
+            std::string filePath = ss;
+            std::ifstream file(filePath);
+            if(file.is_open())
+            {
+                std::string line;
+                while(getline(file, line))
+                {
+                    msg += line;
+                }
+                file.close();
+            }
+            else
+            {
+                msg += "File not found";
+            }
+            std::string msg2 = RPL_BOT(channelName, msg);
+            send_to_members(channelName, msg2, -1);
+            return;
+        }
 
     }
 }
@@ -1033,7 +968,7 @@ void Server::executeCommand(int fd, char *buffer)
     {
         std::string command = token;
         std::string command_name = command.substr(0, command.find(" "));
-        std::string command_param = command.substr(command.find(" ") + 1);
+        std::string command_param = command.substr(command.find(" ") + 1);// PASS THE COMMAND NAME
         findCommand(fd, command_name, command_param);
         token = strtok(NULL, "\r\n");
     }
@@ -1118,4 +1053,62 @@ Channel *Server::getChannelbyName(std::string channelName)
             return &channels[i];
     }
     return NULL;
+}
+
+std::string Server::getJoke()
+{   
+    std::string jokes[] = {
+        "Why did the cigarette apply for a job? It wanted to climb the corporate 'ladder.'",
+        "Smoking is the leading cause of statistics.",
+        "I quit smoking once. It was the hardest two hours of my life.",
+        "What do you call a cigarette in church? A holy smokes.",
+        "Cigarettes and computers have one thing in common: they both make you addicted to tabs.",
+        "Why did the smoker break up with his cigarette? It was a toxic relationship.",
+        "Smoking is like paying to damage your lungs—talk about a bad deal!",
+        "What's a smoker's favorite kind of humor? Dry wit.",
+        "I told my friend I quit smoking, and he said, 'Prove it!' So, I lit one last cigarette to celebrate.",
+        "Why don’t smokers write love letters? They’re too busy sending smoke signals.",
+        "What do you call a stoner’s favorite plant? His bud.",
+        "How do stoners do math? They use 'high-draulics.'",
+        "Why don’t stoners get lost? They always follow the 'high-way.'",
+        "What’s a stoner’s favorite instrument? The 'high'-hat cymbal.",
+        "Why was the stoner so good at gardening? He had a green thumb.",
+        "What do you call a really calm stoner? Laid-back Jack.",
+        "How do you know a stoner has been in your fridge? The door is open, and half the food is gone.",
+        "Why don’t stoners argue? Because they’re all about 'joint' decisions.",
+        "How do you keep a stoner busy all day? Hide their snacks.",
+        "What do you call a stoner’s favorite type of music? Reggae-tunes.",
+        "My friend said smoking was bad, so I stopped… taking his advice.",
+        "What do cigarettes and jokes have in common? You inhale, and they leave you breathless.",
+        "Smokers never get lonely—they always have a pack of friends.",
+        "Why did the smoker go to therapy? He had a burning desire to quit.",
+        "A smoker said he felt invisible. I told him to 'lighten' up.",
+        "Smoking and dating are similar; both can leave you burned.",
+        "What do you call a romantic smoker? A 'match' made in heaven.",
+        "Smokers must really like math—they’re constantly counting cigarettes.",
+        "My grandpa quit smoking cold turkey. Now he only smokes warm chicken.",
+        "Smoking is a great way to start a fire… and a debate.",
+        "Why did the stoner become a baker? He wanted to get baked for a living.",
+        "How does a stoner study? He crams the night before and snacks the morning after.",
+        "What do you call a stoner who works out? A 'high-draulics' engineer.",
+        "Why did the stoner open a pizza shop? He had a craving for success.",
+        "What’s a stoner’s favorite martial art? Toke-wan-do.",
+        "What do you call a weed-smoking dinosaur? A Stoner-saurus Rex.",
+        "Why did the stoner bring a ladder to the party? To reach new 'highs.'",
+        "What do you call a stoner superhero? Captain Kush.",
+        "Why don’t stoners play hide-and-seek? They forget what they’re hiding from.",
+        "What’s a stoner’s favorite game? Hungry, Hungry Hippos.",
+        "Did you hear about the smoker who opened a bakery? He was rolling in dough.",
+        "What’s a smoker’s favorite exercise? Lunges.",
+        "Why do stoners love jokes? Because they’re always 'high-ly' amusing.",
+        "My friend gave up smoking weed and started a garden. Now he’s growing his own green.",
+        "Smokers love motivational speeches—they really 'light a fire' under them.",
+        "What’s a smoker’s favorite fairy tale? Puff the Magic Dragon.",
+        "Did you hear about the stoner poet? His words were 'lit.'",
+        "Smokers and stoners should start a band together—they’d call it 'Smokin’ and Tokin.’",
+        "Why are stoners great at improv? They can 'roll' with anything.",
+        "I asked my friend why he stopped smoking weed. He said, 'It was becoming a real drag.'"
+    };
+    int index = rand() % 50;
+    return jokes[index];
 }
